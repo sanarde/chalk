@@ -23,11 +23,59 @@ Window {
         thickness: 40
     }
 
+    CalendarPopup {
+        id: calendarPopup
+
+        anchorItem: clockButton
+        transientParent: bar
+    }
+
     Component.onCompleted: shell.show()
 
     Row {
         anchors.left: parent.left
         anchors.leftMargin: 8
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 4
+
+        BarButton {
+            text: "Activities"
+            onClicked: slate.action("overview")
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            leftPadding: 8
+            width: Math.min(implicitWidth, bar.width / 4)
+            elide: Text.ElideRight
+            text: slate.connected ? slate.focusedApp : ""
+            font.pixelSize: 14
+            font.weight: Font.Medium
+            color: Theme.onSurfaceVariant
+        }
+    }
+
+    BarButton {
+        id: clockButton
+
+        property date now: new Date()
+
+        anchors.centerIn: parent
+        text: Qt.locale().toString(now, "ddd d MMM  HH:mm")
+        highlighted: calendarPopup.visible
+        onClicked: calendarPopup.toggle()
+
+        Timer {
+            interval: 1000
+            running: true
+            repeat: true
+            onTriggered: clockButton.now = new Date()
+        }
+    }
+
+    Row {
+        anchors.right: parent.right
+        anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         spacing: 4
 
@@ -43,37 +91,6 @@ Window {
                 active: modelData.active
                 onClicked: slate.switchWorkspace(modelData.index)
             }
-        }
-    }
-
-    Text {
-        anchors.centerIn: parent
-        width: Math.min(implicitWidth, parent.width / 3)
-        elide: Text.ElideRight
-        horizontalAlignment: Text.AlignHCenter
-        text: slate.connected ? slate.focusedTitle : "Slate is not running"
-        font.pixelSize: 14
-        color: Theme.onSurfaceVariant
-    }
-
-    Text {
-        id: clock
-
-        property date now: new Date()
-
-        anchors.right: parent.right
-        anchors.rightMargin: 16
-        anchors.verticalCenter: parent.verticalCenter
-        text: Qt.formatDateTime(now, "ddd d MMM  HH:mm")
-        font.pixelSize: 14
-        font.weight: Font.Medium
-        color: Theme.onSurface
-
-        Timer {
-            interval: 1000
-            running: true
-            repeat: true
-            onTriggered: clock.now = new Date()
         }
     }
 }
