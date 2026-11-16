@@ -1,0 +1,26 @@
+Sanar Chalk
+Copyright (C) 2026 AnmiTaliDev
+Licensed under the GNU General Public License, version 3 only (GPL-3.0-only).
+See the file LICENSE.
+
+Chalk contains and uses the following third party material.
+
+Wayland protocol descriptions, in the directory protocols:
+
+  wlr-layer-shell-unstable-v1.xml   Copyright 2017 Drew DeVault, permissive license stated in the file
+                                    https://gitlab.freedesktop.org/wlroots/wlr-protocols
+                                    Changed: the argument "namespace" of get_layer_surface is
+                                    called "name_space", because namespace is a C++ keyword.
+  xdg-shell.xml                     Copyright 2008-2017 Kristian Hogsberg and others, MIT license stated in the file
+                                    https://gitlab.freedesktop.org/wayland/wayland-protocols
+
+Libraries:
+
+  Qt 6 (Core, Gui, Quick, Network, WaylandClient)   LGPL-3.0 or GPL, https://www.qt.io
+  Sanar Style                                        GPL-3.0, with Roboto Flex (SIL OFL 1.1) and
+                                                     Material Symbols (Apache-2.0) fonts
+  libxcb, libwayland-client                          MIT
+
+The layer shell plugin in layershell is written for Chalk. The way a Qt shell integration plugin
+works, with the private API of QtWaylandClient, follows the plugin of LayerShellQt, a KDE project
+under LGPL-2.1-or-later and MIT, which was read as a reference. No code was copied.
