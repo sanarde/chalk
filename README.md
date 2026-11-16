@@ -9,7 +9,7 @@ Panels and bars of SanarDE, written in C++ and QML, with the goal of a complete 
 - Qt 6.8 or newer (Core, Gui, Quick, Network)
 - CMake 3.21 or newer, Ninja
 - A C++20 compiler
-- libxcb and its headers
+- libxcb, libwayland-client and their headers, and the private headers of QtWaylandClient (the layer shell plugin uses them)
 - [Sanar Style](https://git.nuros.org/sanarde/style), the shared Material You theme and components
 
 At run time:
@@ -31,7 +31,11 @@ The binary is `build/src/chalk`.
 
 Start `chalk` after the session has started, for example with `exec-once = chalk` in `slate.conf`. When Sanar Style is not installed in a system prefix, set `QML_IMPORT_PATH=<prefix>/lib/qt6/qml` and `LD_LIBRARY_PATH=<prefix>/lib`.
 
-The bar is a dock window of the X11 type: it reserves its space on the top edge of the screen. On a Wayland session it needs `QT_QPA_PLATFORM=xcb`, which runs it through Xwayland, and it does not reserve space there yet.
+On Wayland the bar is a surface of the layer shell protocol (`wlr-layer-shell`), anchored to the top edge with an exclusive zone, so that the windows leave room for it, and the calendar is an overlay layer over the whole screen that closes on a click outside of it or on Escape. Chalk brings its own Qt plugin for that, `chalk-layer-shell`, found next to the binary in `plugins` or in the Qt plugin directory after `cmake --install`. Slate supports the protocol. On X11 the bar is a dock window of the X11 type with a strut and the calendar is a popup window. `QT_QPA_PLATFORM` chooses between them, the default follows the session.
+
+`chalk --calendar` opens the calendar at start.
+
+In a nested compositor without `linux-dmabuf`, such as `slate --backend winit`, Qt Quick cannot use OpenGL, run with `QT_QUICK_BACKEND=software`.
 
 ## Activities
 
@@ -41,7 +45,6 @@ The Activities button runs the action `overview` of Slate. On Wayland Slate show
 
 - Notifications (the `org.freedesktop.Notifications` service) with a history in the calendar.
 - Quick settings: volume, brightness, Wi-Fi, Bluetooth, power, night mode.
-- Layer shell support, so that the bar reserves its space in a Wayland session without Xwayland.
 - A list of open windows and a launcher.
 - A system tray, volume, network and battery.
 - A bottom panel or a dock.
