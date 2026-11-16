@@ -12,9 +12,17 @@ Rectangle {
 
     signal clicked
 
-    width: 32
+    width: active ? 56 : 32
     height: 32
     radius: height / 2
+
+    Behavior on width {
+        NumberAnimation {
+            duration: Tokens.exitDuration
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Tokens.emphasizedDecelerate
+        }
+    }
     color: active ? Theme.primaryContainer : "transparent"
     activeFocusOnTab: true
 

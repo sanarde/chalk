@@ -47,13 +47,31 @@ int Calendar::month() const
     return m_month;
 }
 
-QString Calendar::title() const
+static QString capitalized(const QString &text)
+{
+    return text.isEmpty() ? text : text.at(0).toUpper() + text.mid(1);
+}
+
+QString Calendar::monthName() const
+{
+    return capitalized(QLocale().standaloneMonthName(m_month, QLocale::LongFormat));
+}
+
+QStringList Calendar::months() const
 {
     const QLocale locale;
-    const QString month = locale.standaloneMonthName(m_month, QLocale::LongFormat);
+    QStringList names;
+    for (int month = 1; month <= 12; ++month)
+        names.append(capitalized(locale.standaloneMonthName(month, QLocale::LongFormat)));
+    return names;
+}
+
+QString Calendar::title() const
+{
+    const QString month = monthName();
     if (month.isEmpty())
         return {};
-    return month.at(0).toUpper() + month.mid(1) + QLatin1Char(' ') + QString::number(m_year);
+    return month + QLatin1Char(' ') + QString::number(m_year);
 }
 
 QVariantList Calendar::days() const
@@ -98,6 +116,15 @@ void Calendar::today()
     const QDate now = QDate::currentDate();
     m_year = now.year();
     m_month = now.month();
+    emit changed();
+}
+
+void Calendar::show(int year, int month)
+{
+    if (!QDate(year, month, 1).isValid())
+        return;
+    m_year = year;
+    m_month = month;
     emit changed();
 }
 

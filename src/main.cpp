@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QFont>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
@@ -21,6 +22,9 @@ int main(int argc, char *argv[])
     QCoreApplication::addLibraryPath(QDir::cleanPath(executable + QStringLiteral("/../plugins")));
 
     QGuiApplication app(argc, argv);
+    QFont font = app.font();
+    font.setStyleStrategy(QFont::StyleStrategy(font.styleStrategy() | QFont::NoSubpixelAntialias));
+    app.setFont(font);
     app.setApplicationName(QStringLiteral("chalk"));
     app.setApplicationVersion(QStringLiteral(CHALK_VERSION));
     app.setQuitOnLastWindowClosed(true);

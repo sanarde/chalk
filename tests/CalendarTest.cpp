@@ -17,6 +17,8 @@ private slots:
     void marksTodayTheMonthAndTheWeekend();
     void handlesLeapDaysAndYearEnds();
     void rejectsInvalidMonths();
+    void jumpsToAMonthAndIgnoresInvalidOnes();
+    void listsTwelveCapitalizedMonths();
 };
 
 void CalendarTest::alwaysBuildsSixWeeks()
@@ -80,6 +82,27 @@ void CalendarTest::rejectsInvalidMonths()
 {
     QVERIFY(buildMonth(2026, 0, QDate(2026, 1, 1), Qt::Monday).isEmpty());
     QVERIFY(buildMonth(2026, 13, QDate(2026, 1, 1), Qt::Monday).isEmpty());
+}
+
+void CalendarTest::jumpsToAMonthAndIgnoresInvalidOnes()
+{
+    Calendar calendar;
+    calendar.show(2031, 2);
+    QCOMPARE(calendar.year(), 2031);
+    QCOMPARE(calendar.month(), 2);
+    calendar.show(2040, 13);
+    calendar.show(2040, 0);
+    QCOMPARE(calendar.year(), 2031);
+    QCOMPARE(calendar.month(), 2);
+}
+
+void CalendarTest::listsTwelveCapitalizedMonths()
+{
+    Calendar calendar;
+    const QStringList months = calendar.months();
+    QCOMPARE(months.size(), 12);
+    for (const QString &name : months)
+        QVERIFY(!name.isEmpty() && name.at(0).isUpper());
 }
 
 QTEST_APPLESS_MAIN(CalendarTest)

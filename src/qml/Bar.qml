@@ -22,7 +22,7 @@ Window {
 
         window: bar
         edge: PanelShell.Top
-        thickness: 40
+        thickness: 48
     }
 
     CalendarPopup {
@@ -44,20 +44,22 @@ Window {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 4
 
-        PillButton {
-            text: "Activities"
+        IconButton {
+            anchors.verticalCenter: parent.verticalCenter
+            icon: "grid_view"
+            iconColor: Theme.onSurface
+            label: qsTr("Activities")
             onClicked: slate.action("overview")
         }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            leftPadding: 8
+            leftPadding: 4
             width: Math.min(implicitWidth, bar.width / 4)
             elide: Text.ElideRight
             text: slate.connected ? slate.focusedApp : ""
-            font.pixelSize: Tokens.labelLarge
-            font.weight: Font.Medium
-            color: Theme.onSurfaceVariant
+            font.pixelSize: Tokens.titleMedium
+            color: Theme.onSurface
         }
     }
 
