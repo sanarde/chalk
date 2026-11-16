@@ -7,7 +7,11 @@
 #include <QGuiApplication>
 #include <QScreen>
 
+#include <xcb/shape.h>
 #include <xcb/xcb.h>
+
+#include <QList>
+#include <cmath>
 
 namespace Chalk {
 
@@ -113,6 +117,41 @@ void PanelShell::show()
         placeOnWayland();
 
     m_window->show();
+}
+
+void PanelShell::roundCorners(int radius)
+{
+    if (!m_window || QGuiApplication::platformName() != QLatin1String("xcb") || radius <= 0)
+        return;
+    auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    if (!x11 || !m_window->winId())
+        return;
+
+    const qreal scale = m_window->devicePixelRatio();
+    const int width = qRound(m_window->width() * scale);
+    const int height = qRound(m_window->height() * scale);
+    const int r = std::min({qRound(radius * scale), width / 2, height / 2});
+    if (r <= 0)
+        return;
+
+    QList<xcb_rectangle_t> rows;
+    rows.reserve(height);
+    for (int y = 0; y < height; ++y) {
+        const int edge = y < r ? r - y : (y >= height - r ? y - (height - r) + 1 : 0);
+        int inset = 0;
+        if (edge > 0) {
+            const double dy = edge - 0.5;
+            inset = r - static_cast<int>(std::floor(std::sqrt(static_cast<double>(r) * r - dy * dy)));
+        }
+        rows.append({static_cast<int16_t>(inset), static_cast<int16_t>(y),
+                     static_cast<uint16_t>(width - 2 * inset), 1});
+    }
+
+    xcb_connection_t *connection = x11->connection();
+    xcb_shape_rectangles(connection, XCB_SHAPE_SO_SET, XCB_SHAPE_SK_BOUNDING, XCB_CLIP_ORDERING_UNSORTED,
+                         static_cast<xcb_window_t>(m_window->winId()), 0, 0,
+                         static_cast<uint32_t>(rows.size()), rows.constData());
+    xcb_flush(connection);
 }
 
 void PanelShell::placeOnWayland()

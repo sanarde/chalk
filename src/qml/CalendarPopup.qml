@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import QtQuick
-import QtQuick.Effects
 import Sanar.Chalk
 import Sanar.Style
 
@@ -58,6 +57,15 @@ Window {
     }
 
     flags: Qt.Popup | Qt.FramelessWindowHint
+
+    function round() {
+        if (!overlay && visible)
+            shell.roundCorners(Tokens.cornerExtraLarge)
+    }
+
+    onVisibleChanged: round()
+    onWidthChanged: round()
+    onHeightChanged: round()
     color: overlay ? "transparent" : Theme.surfaceHigh
 
     Calendar {
@@ -89,20 +97,29 @@ Window {
         y: popup.overlay ? popup.cardY : 0
         width: 360
         height: content.implicitHeight + 32
-        radius: popup.overlay ? Tokens.cornerExtraLarge : 0
+        radius: Tokens.cornerExtraLarge
         color: Theme.surfaceHigh
         border.width: 1
         border.color: Theme.outlineVariant
         opacity: popup.shown ? 1 : 0
         scale: popup.shown ? 1 : 0.92
         transformOrigin: Item.Top
-        layer.enabled: popup.overlay
-        layer.effect: MultiEffect {
-            autoPaddingEnabled: true
-            shadowEnabled: true
-            shadowColor: Qt.alpha("black", 0.3)
-            shadowBlur: 0.8
-            shadowVerticalOffset: 6
+
+        Repeater {
+            model: popup.overlay ? 8 : 0
+
+            Rectangle {
+                required property int index
+
+                z: -1
+                anchors.fill: parent
+                anchors.topMargin: -index
+                anchors.leftMargin: -index * 1.5
+                anchors.rightMargin: -index * 1.5
+                anchors.bottomMargin: -index * 2 - 2
+                radius: card.radius + index * 1.5
+                color: Qt.alpha("black", 0.045)
+            }
         }
 
         Behavior on opacity {

@@ -32,10 +32,13 @@ Window {
         transientParent: bar
     }
 
-    Component.onCompleted: {
-        shell.show()
-        if (openCalendar)
+    Component.onCompleted: shell.show()
+
+    onWidthChanged: {
+        if (openCalendar && width > 100) {
+            openCalendar = false
             Qt.callLater(() => calendarPopup.toggle())
+        }
     }
 
     Row {

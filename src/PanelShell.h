@@ -36,6 +36,7 @@ public:
     void setThickness(int thickness);
 
     Q_INVOKABLE void show();
+    Q_INVOKABLE void roundCorners(int radius);
 
 signals:
     void windowChanged();

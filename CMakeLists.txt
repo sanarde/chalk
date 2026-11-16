@@ -11,7 +11,7 @@ find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Network)
 find_package(Qt6 6.8 QUIET COMPONENTS Test)
 find_package(SanarStyle REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(XCB REQUIRED IMPORTED_TARGET xcb)
+pkg_check_modules(XCB REQUIRED IMPORTED_TARGET xcb xcb-shape)
 qt_standard_project_setup(REQUIRES 6.8)
 
 include(GNUInstallDirs)
