@@ -44,7 +44,7 @@ Window {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 4
 
-        BarButton {
+        PillButton {
             text: "Activities"
             onClicked: slate.action("overview")
         }
@@ -61,7 +61,7 @@ Window {
         }
     }
 
-    BarButton {
+    PillButton {
         id: clockButton
 
         property date now: new Date()

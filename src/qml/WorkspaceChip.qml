@@ -23,12 +23,13 @@ Rectangle {
     Accessible.checked: active
     Accessible.onPressAction: chip.clicked()
 
-    Rectangle {
+    StateLayer {
         anchors.fill: parent
         radius: parent.radius
         color: chip.active ? Theme.onPrimaryContainer : Theme.onSurface
-        opacity: tap.pressed ? Tokens.pressedOpacity
-            : (chip.activeFocus ? Tokens.focusOpacity : (hover.hovered ? Tokens.hoverOpacity : 0))
+        hovered: hover.hovered
+        pressed: tap.pressed
+        focused: chip.activeFocus
     }
 
     Text {

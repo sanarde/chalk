@@ -13,7 +13,8 @@ Source layout:
 - `src/PanelShell.*`: placing a window as a panel or as a full screen overlay, the X11 dock type with the strut, or the layer shell properties on Wayland. `src/PanelProperties.*` is the description of those properties, shared with the plugin.
 - `layershell`: the Qt shell integration plugin `chalk-layer-shell`, `LayerShell` binds `zwlr_layer_shell_v1`, `LayerSurface` is one layer surface. It uses the private API of QtWaylandClient, so it has to be built with the same Qt as the application. The surface is exposed after the first configure with `updateExposure`, without it Qt never renders. `protocols` holds the XML files that the plugin is generated from.
 - `src/Calendar.*`: the month grid (`buildMonth`, tested) and the model of the calendar popup, localized names and the first day of the week of the system.
-- `src/qml/Tokens.qml`: the Material Design 3 tokens as a singleton: shape corners, state layer opacities (hover 8 %, pressed and focus 10 %), type sizes and the emphasized motion curves with their durations. Components take every number from it, do not write magic values in QML.
-- `src/qml`: the components of the bar, `Bar.qml` is the window, `BarButton.qml` the pill buttons, `CalendarPopup.qml` the calendar window and `WorkspaceChip.qml` a workspace. Colors and icons come from the `Theme` and `Icon` of Sanar Style, do not write colors in QML.
+- `src/qml`: the components of the bar, `Bar.qml` is the window, `CalendarPopup.qml` the calendar window and `WorkspaceChip.qml` a workspace. Colors and icons come from the `Theme` and `Icon` of Sanar Style, do not write colors in QML.
 
 Code style: C++20, four spaces, no comments except the SPDX line at the top of each file, names that explain themselves.
+
+Shape, state layer, type and motion tokens, the `StateLayer` and the `PillButton` live in Sanar Style (`Tokens`, `StateLayer`, `PillButton`), not here. Add a new shared token or a generic component there, and keep only the shell specific pieces in `src/qml`.
