@@ -35,10 +35,20 @@ SlateState parseState(const QByteArray &line)
         const QJsonObject window = value.toObject();
         if (window.value("focused").toBool()) {
             state.focusedTitle = window.value("title").toString();
+            state.focusedAppId = window.value("app_id").toString();
             break;
         }
     }
     return state;
+}
+
+QString appDisplayName(const QString &appId, const QString &title)
+{
+    QString name = appId.section('.', -1).trimmed();
+    name.replace('-', ' ').replace('_', ' ');
+    if (name.isEmpty())
+        return title;
+    return name.at(0).toUpper() + name.mid(1);
 }
 
 }

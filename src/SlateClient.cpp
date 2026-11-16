@@ -78,10 +78,20 @@ QString SlateClient::focusedTitle() const
     return m_state.focusedTitle;
 }
 
+QString SlateClient::focusedApp() const
+{
+    return appDisplayName(m_state.focusedAppId, m_state.focusedTitle);
+}
+
 void SlateClient::switchWorkspace(int index)
 {
+    action(QStringLiteral("workspace %1").arg(index));
+}
+
+void SlateClient::action(const QString &action)
+{
     if (m_control.state() == QLocalSocket::ConnectedState)
-        m_control.write(command("action workspace " + QByteArray::number(index)));
+        m_control.write(command("action " + action.toUtf8()));
 }
 
 void SlateClient::connectToSlate()

@@ -21,8 +21,10 @@ struct SlateState {
     int workspace = 0;
     QList<WorkspaceInfo> workspaces;
     QString focusedTitle;
+    QString focusedAppId;
 };
 
 SlateState parseState(const QByteArray &line);
+QString appDisplayName(const QString &appId, const QString &title);
 
 }

@@ -15,6 +15,7 @@ private slots:
     void ignoresAnAcknowledgementWithoutState();
     void rejectsErrorsAndGarbage();
     void leavesTheTitleEmptyWhenNothingIsFocused();
+    void buildsTheAppNameFromTheAppId();
 };
 
 void SlateStateTest::parsesTheWorkspacesAndTheFocusedTitle()
@@ -22,7 +23,7 @@ void SlateStateTest::parsesTheWorkspacesAndTheFocusedTitle()
     const QByteArray line = R"({"ok":true,"data":{"workspace":2,"focused":7,
         "workspaces":[{"index":1,"layout":"floating","windows":0,"active":false},
                       {"index":2,"layout":"grid","windows":3,"active":true}],
-        "windows":[{"id":5,"title":"one","focused":false},{"id":7,"title":"Terminal","focused":true}],
+        "windows":[{"id":5,"title":"one","focused":false},{"id":7,"title":"Terminal","app_id":"org.gnome.Terminal","focused":true}],
         "outputs":[]}})";
 
     const SlateState state = parseState(line);
@@ -31,6 +32,7 @@ void SlateStateTest::parsesTheWorkspacesAndTheFocusedTitle()
     QCOMPARE(state.workspaces.size(), 2);
     QCOMPARE(state.workspaces[1], (WorkspaceInfo{.index = 2, .windows = 3, .active = true}));
     QCOMPARE(state.focusedTitle, QStringLiteral("Terminal"));
+    QCOMPARE(state.focusedAppId, QStringLiteral("org.gnome.Terminal"));
 }
 
 void SlateStateTest::ignoresAnAcknowledgementWithoutState()
@@ -53,6 +55,15 @@ void SlateStateTest::leavesTheTitleEmptyWhenNothingIsFocused()
         R"({"ok":true,"data":{"workspace":1,"workspaces":[{"index":1,"windows":0,"active":true}],"windows":[]}})");
     QVERIFY(state.valid);
     QVERIFY(state.focusedTitle.isEmpty());
+}
+
+void SlateStateTest::buildsTheAppNameFromTheAppId()
+{
+    QCOMPARE(appDisplayName("org.gnome.Calculator", "x"), QStringLiteral("Calculator"));
+    QCOMPARE(appDisplayName("firefox", "x"), QStringLiteral("Firefox"));
+    QCOMPARE(appDisplayName("gnome-terminal", "x"), QStringLiteral("Gnome terminal"));
+    QCOMPARE(appDisplayName("", "A title"), QStringLiteral("A title"));
+    QCOMPARE(appDisplayName("", ""), QString());
 }
 
 QTEST_APPLESS_MAIN(SlateStateTest)
