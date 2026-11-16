@@ -18,6 +18,8 @@ qt_add_qml_module(chalk
         SlateState.cpp
         SlateClient.h
         SlateClient.cpp
+        PanelProperties.h
+        PanelProperties.cpp
         PanelShell.h
         PanelShell.cpp
 )

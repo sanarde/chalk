@@ -2,6 +2,8 @@
 
 #include "PanelShell.h"
 
+#include "PanelProperties.h"
+
 #include <QGuiApplication>
 #include <QScreen>
 
@@ -70,6 +72,19 @@ void PanelShell::setThickness(int thickness)
     emit thicknessChanged();
 }
 
+PanelShell::Kind PanelShell::kind() const
+{
+    return m_kind;
+}
+
+void PanelShell::setKind(Kind kind)
+{
+    if (m_kind == kind)
+        return;
+    m_kind = kind;
+    emit kindChanged();
+}
+
 void PanelShell::show()
 {
     if (!m_window)
@@ -77,16 +92,45 @@ void PanelShell::show()
 
     QScreen *screen = m_window->screen() ? m_window->screen() : QGuiApplication::primaryScreen();
     const QRect area = screen->geometry();
-    const int y = m_edge == Top ? area.top() : area.bottom() + 1 - m_thickness;
 
     m_window->setFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus
                        | Qt::WindowStaysOnTopHint);
-    m_window->setGeometry(area.left(), y, area.width(), m_thickness);
 
-    if (QGuiApplication::platformName() == QLatin1String("xcb"))
+    const bool wayland = QGuiApplication::platformName() == QLatin1String("wayland");
+    if (m_kind == Overlay) {
+        m_window->setFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        m_window->setGeometry(wayland ? QRect(0, 0, 1, 1) : area);
+    } else if (wayland) {
+        m_window->setGeometry(0, 0, 1, m_thickness);
+    } else {
+        const int y = m_edge == Top ? area.top() : area.bottom() + 1 - m_thickness;
+        m_window->setGeometry(area.left(), y, area.width(), m_thickness);
+    }
+
+    if (QGuiApplication::platformName() == QLatin1String("xcb") && m_kind == Panel)
         placeOnX11();
+    else if (wayland)
+        placeOnWayland();
 
     m_window->show();
+}
+
+void PanelShell::placeOnWayland()
+{
+    PanelProperties::Panel panel;
+    if (m_kind == Overlay) {
+        panel.layer = PanelProperties::Overlay;
+        panel.anchors = PanelProperties::AnchorAll;
+        panel.exclusive = -1;
+        panel.keyboard = PanelProperties::KeyboardOnDemand;
+    } else {
+        panel.layer = PanelProperties::Top;
+        panel.anchors = (m_edge == Top ? PanelProperties::AnchorTop : PanelProperties::AnchorBottom)
+            | PanelProperties::AnchorLeft | PanelProperties::AnchorRight;
+        panel.height = m_thickness;
+        panel.exclusive = m_thickness;
+    }
+    m_window->setProperty(PanelProperties::WindowProperty, PanelProperties::toMap(panel));
 }
 
 void PanelShell::placeOnX11()
