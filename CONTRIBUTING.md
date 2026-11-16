@@ -11,6 +11,7 @@ Source layout:
 - `src/SlateState.*`: parsing of the `state` reply of the Slate IPC into plain structures, tested in `tests`.
 - `src/SlateClient.*`: the connection to the Slate IPC socket, two sockets (requests and the event subscription), reconnection and the properties for QML.
 - `src/PanelShell.*`: placing a window as a panel, the X11 dock type and the strut now, layer shell later.
-- `src/qml`: the components of the bar. Colors and icons come from the `Theme` and `Icon` of Sanar Style, do not write colors in QML.
+- `src/Calendar.*`: the month grid (`buildMonth`, tested) and the model of the calendar popup, localized names and the first day of the week of the system.
+- `src/qml`: the components of the bar, `Bar.qml` is the window, `BarButton.qml` the pill buttons, `CalendarPopup.qml` the calendar window and `WorkspaceChip.qml` a workspace. Colors and icons come from the `Theme` and `Icon` of Sanar Style, do not write colors in QML.
 
 Code style: C++20, four spaces, no comments except the SPDX line at the top of each file, names that explain themselves.

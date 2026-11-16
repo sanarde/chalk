@@ -2,7 +2,7 @@
 
 ## About
 
-Panels and bars of SanarDE, written in C++ and QML. The first panel is a top bar with the workspaces of the Slate window manager, the title of the focused window and a clock. It follows the Material You colors of Sanar Style.
+Panels and bars of SanarDE, written in C++ and QML, with the goal of a complete desktop shell. The first panel is a top bar in the manner of GNOME Shell: the Activities button on the left, the name of the focused application, the date and time in the middle that open a calendar, and the workspaces of the Slate window manager on the right. It follows the Material You colors of Sanar Style and the language of the system.
 
 ## Dependencies
 
@@ -33,8 +33,14 @@ Start `chalk` after the session has started, for example with `exec-once = chalk
 
 The bar is a dock window of the X11 type: it reserves its space on the top edge of the screen. On a Wayland session it needs `QT_QPA_PLATFORM=xcb`, which runs it through Xwayland, and it does not reserve space there yet.
 
+## Activities
+
+The Activities button runs the action `overview` of Slate. On Wayland Slate shows its overview of the windows, on X11 there is no overview and the button does nothing.
+
 ## Roadmap
 
+- Notifications (the `org.freedesktop.Notifications` service) with a history in the calendar.
+- Quick settings: volume, brightness, Wi-Fi, Bluetooth, power, night mode.
 - Layer shell support, so that the bar reserves its space in a Wayland session without Xwayland.
 - A list of open windows and a launcher.
 - A system tray, volume, network and battery.
