@@ -7,6 +7,8 @@ import Sanar.Style
 Window {
     id: bar
 
+    property bool openCalendar: false
+
     title: "Chalk"
     color: Theme.surface
     visible: false
@@ -30,7 +32,11 @@ Window {
         transientParent: bar
     }
 
-    Component.onCompleted: shell.show()
+    Component.onCompleted: {
+        shell.show()
+        if (openCalendar)
+            Qt.callLater(() => calendarPopup.toggle())
+    }
 
     Row {
         anchors.left: parent.left
