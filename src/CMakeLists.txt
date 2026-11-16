@@ -8,8 +8,12 @@ qt_add_qml_module(chalk
     VERSION 1.0
     QML_FILES
         qml/Bar.qml
+        qml/BarButton.qml
+        qml/CalendarPopup.qml
         qml/WorkspaceChip.qml
     SOURCES
+        Calendar.h
+        Calendar.cpp
         SlateState.h
         SlateState.cpp
         SlateClient.h
