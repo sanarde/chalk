@@ -15,12 +15,26 @@ Rectangle {
     width: 32
     height: 32
     radius: height / 2
-    color: active ? Theme.primaryContainer : (hover.hovered ? Theme.surfaceHigh : "transparent")
+    color: active ? Theme.primaryContainer : "transparent"
+    activeFocusOnTab: true
+
+    Accessible.role: Accessible.Button
+    Accessible.name: qsTr("Workspace %1").arg(index)
+    Accessible.checked: active
+    Accessible.onPressAction: chip.clicked()
+
+    Rectangle {
+        anchors.fill: parent
+        radius: parent.radius
+        color: chip.active ? Theme.onPrimaryContainer : Theme.onSurface
+        opacity: tap.pressed ? Tokens.pressedOpacity
+            : (chip.activeFocus ? Tokens.focusOpacity : (hover.hovered ? Tokens.hoverOpacity : 0))
+    }
 
     Text {
         anchors.centerIn: parent
         text: chip.index
-        font.pixelSize: 14
+        font.pixelSize: Tokens.labelLarge
         font.weight: chip.active ? Font.DemiBold : Font.Normal
         color: chip.active ? Theme.onPrimaryContainer : Theme.onSurfaceVariant
     }
@@ -41,6 +55,11 @@ Rectangle {
     }
 
     TapHandler {
+        id: tap
+
         onTapped: chip.clicked()
     }
+
+    Keys.onReturnPressed: chip.clicked()
+    Keys.onSpacePressed: chip.clicked()
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 import QtQuick
+import QtQuick.Effects
 import Sanar.Chalk
 import Sanar.Style
 
@@ -10,11 +11,19 @@ Window {
     property Item anchorItem
     property real cardX: 0
     property real cardY: 0
+    property bool shown: false
     readonly property bool overlay: Qt.platform.pluginName === "wayland"
 
+    function dismiss() {
+        if (!shown)
+            return
+        shown = false
+        closeTimer.restart()
+    }
+
     function toggle() {
-        if (visible) {
-            hide()
+        if (visible && shown) {
+            dismiss()
             return
         }
         calendar.today()
@@ -22,6 +31,8 @@ Window {
         cardX = Math.round(point.x - card.width / 2)
         cardY = Math.round(point.y + 4)
 
+        closeTimer.stop()
+        shown = true
         if (overlay) {
             shell.show()
             return
@@ -31,6 +42,13 @@ Window {
         x = cardX
         y = cardY
         show()
+    }
+
+    Timer {
+        id: closeTimer
+
+        interval: Tokens.exitDuration
+        onTriggered: popup.hide()
     }
 
     flags: Qt.Popup | Qt.FramelessWindowHint
@@ -49,13 +67,13 @@ Window {
 
     Shortcut {
         sequence: "Escape"
-        onActivated: popup.hide()
+        onActivated: popup.dismiss()
     }
 
     MouseArea {
         anchors.fill: parent
         enabled: popup.overlay
-        onClicked: popup.hide()
+        onClicked: popup.dismiss()
     }
 
     Rectangle {
@@ -65,10 +83,37 @@ Window {
         y: popup.overlay ? popup.cardY : 0
         width: 336
         height: content.implicitHeight + 32
-        radius: popup.overlay ? 28 : 0
+        radius: popup.overlay ? Tokens.cornerExtraLarge : 0
         color: Theme.surfaceHigh
         border.width: 1
         border.color: Theme.outlineVariant
+        opacity: popup.shown ? 1 : 0
+        scale: popup.shown ? 1 : 0.92
+        transformOrigin: Item.Top
+        layer.enabled: popup.overlay
+        layer.effect: MultiEffect {
+            autoPaddingEnabled: true
+            shadowEnabled: true
+            shadowColor: Qt.alpha("black", 0.3)
+            shadowBlur: 0.8
+            shadowVerticalOffset: 6
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: popup.shown ? Tokens.enterDuration : Tokens.exitDuration
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: popup.shown ? Tokens.emphasizedDecelerate : Tokens.emphasizedAccelerate
+            }
+        }
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: popup.shown ? Tokens.enterDuration : Tokens.exitDuration
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: popup.shown ? Tokens.emphasizedDecelerate : Tokens.emphasizedAccelerate
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
@@ -90,7 +135,7 @@ Window {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: calendar.title
-                    font.pixelSize: 18
+                    font.pixelSize: Tokens.titleMedium
                     font.weight: Font.Medium
                     color: Theme.onSurface
                 }
@@ -128,7 +173,7 @@ Window {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         text: modelData
-                        font.pixelSize: 12
+                        font.pixelSize: Tokens.labelMedium
                         color: Theme.onSurfaceVariant
                     }
                 }
@@ -152,7 +197,7 @@ Window {
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData.day
-                                font.pixelSize: 14
+                                font.pixelSize: Tokens.bodyMedium
                                 font.weight: modelData.today ? Font.DemiBold : Font.Normal
                                 color: modelData.today ? Theme.onPrimary
                                     : (modelData.inMonth ? Theme.onSurface : Qt.alpha(Theme.onSurfaceVariant, 0.5))

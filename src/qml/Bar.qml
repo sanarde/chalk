@@ -55,7 +55,7 @@ Window {
             width: Math.min(implicitWidth, bar.width / 4)
             elide: Text.ElideRight
             text: slate.connected ? slate.focusedApp : ""
-            font.pixelSize: 14
+            font.pixelSize: Tokens.labelLarge
             font.weight: Font.Medium
             color: Theme.onSurfaceVariant
         }

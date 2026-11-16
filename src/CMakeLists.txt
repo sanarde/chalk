@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
+set_source_files_properties(qml/Tokens.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
 qt_add_executable(chalk main.cpp)
 target_compile_definitions(chalk PRIVATE CHALK_VERSION="${PROJECT_VERSION}")
 
@@ -10,6 +12,7 @@ qt_add_qml_module(chalk
         qml/Bar.qml
         qml/BarButton.qml
         qml/CalendarPopup.qml
+        qml/Tokens.qml
         qml/WorkspaceChip.qml
     SOURCES
         Calendar.h
