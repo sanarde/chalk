@@ -16,12 +16,13 @@ class PanelShell : public QObject
     Q_PROPERTY(Edge edge READ edge WRITE setEdge NOTIFY edgeChanged FINAL)
     Q_PROPERTY(int thickness READ thickness WRITE setThickness NOTIFY thicknessChanged FINAL)
     Q_PROPERTY(Kind kind READ kind WRITE setKind NOTIFY kindChanged FINAL)
+    Q_PROPERTY(int margin READ margin WRITE setMargin NOTIFY marginChanged FINAL)
 
 public:
     enum Edge { Top, Bottom };
     Q_ENUM(Edge)
 
-    enum Kind { Panel, Overlay };
+    enum Kind { Panel, Overlay, Banner };
     Q_ENUM(Kind)
 
     explicit PanelShell(QObject *parent = nullptr);
@@ -33,6 +34,8 @@ public:
     int thickness() const;
     Kind kind() const;
     void setKind(Kind kind);
+    int margin() const;
+    void setMargin(int margin);
     void setThickness(int thickness);
 
     Q_INVOKABLE void show();
@@ -43,6 +46,7 @@ signals:
     void edgeChanged();
     void thicknessChanged();
     void kindChanged();
+    void marginChanged();
 
 private:
     void placeOnX11();
@@ -51,6 +55,7 @@ private:
     QWindow *m_window = nullptr;
     Edge m_edge = Top;
     int m_thickness = 40;
+    int m_margin = 0;
     Kind m_kind = Panel;
 };
 

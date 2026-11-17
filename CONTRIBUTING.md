@@ -18,3 +18,5 @@ Source layout:
 Code style: C++20, four spaces, no comments except the SPDX line at the top of each file, names that explain themselves.
 
 Shape, state layer, type and motion tokens, the `StateLayer` and the `PillButton` live in Sanar Style (`Tokens`, `StateLayer`, `PillButton`), not here. Add a new shared token or a generic component there, and keep only the shell specific pieces in `src/qml`.
+
+`src/NotificationStore.*` is the model and the rules of the notifications without D-Bus, so that the tests cover it. `src/NotificationServer.*` is only the D-Bus glue, and `src/qml/NotificationBanner.qml` the banner. Test the daemon on a separate bus, `dbus-run-session -- sh -c '...'`, never on the bus of your session.

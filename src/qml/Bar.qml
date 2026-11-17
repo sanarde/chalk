@@ -25,9 +25,25 @@ Window {
         thickness: 48
     }
 
+    NotificationStore {
+        id: notifications
+    }
+
+    NotificationServer {
+        id: notificationServer
+
+        store: notifications
+        Component.onCompleted: start()
+    }
+
+    NotificationBanner {
+        store: notifications
+    }
+
     CalendarPopup {
         id: calendarPopup
 
+        notifications: notifications
         anchorItem: clockButton
         transientParent: bar
     }

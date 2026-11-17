@@ -12,6 +12,7 @@ Window {
     property real cardY: 0
     property bool shown: false
     property string selector: ""
+    property NotificationStore notifications
     readonly property var yearList: Array.from({ length: 201 }, (_, offset) => 1926 + offset)
     property int selectedYear: 0
     property int selectedMonth: 0
@@ -294,6 +295,121 @@ Window {
                     }
                 }
             }
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Theme.outlineVariant
+            }
+
+            Item {
+                width: parent.width
+                height: 40
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Notifications")
+                    font.pixelSize: Tokens.titleMedium
+                    color: Theme.onSurface
+                }
+
+                PillButton {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: popup.notifications && popup.notifications.count > 0
+                    text: qsTr("Clear all")
+                    textColor: Theme.primary
+                    onClicked: popup.notifications.clear()
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: 192
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: !popup.notifications || popup.notifications.count === 0
+                    text: qsTr("No notifications")
+                    font.pixelSize: Tokens.bodyLarge
+                    color: Theme.onSurfaceVariant
+                }
+
+                ListView {
+                    anchors.fill: parent
+                    clip: true
+                    model: popup.notifications
+
+                    delegate: Item {
+                        id: entry
+
+                        required property var model
+
+                        width: ListView.view.width
+                        height: 64
+
+                        StateLayer {
+                            anchors.fill: parent
+                            radius: Tokens.cornerMedium
+                            hovered: entryHover.hovered
+                        }
+
+                        HoverHandler {
+                            id: entryHover
+                        }
+
+                        Column {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 12
+                            anchors.right: entryTime.left
+                            anchors.rightMargin: 8
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Text {
+                                width: parent.width
+                                elide: Text.ElideRight
+                                text: entry.model.summary
+                                font.pixelSize: Tokens.bodyLarge
+                                color: Theme.onSurface
+                            }
+
+                            Text {
+                                width: parent.width
+                                elide: Text.ElideRight
+                                textFormat: Text.StyledText
+                                text: entry.model.app + (entry.model.body ? "  " + entry.model.body : "")
+                                font.pixelSize: Tokens.labelLarge
+                                color: Theme.onSurfaceVariant
+                            }
+                        }
+
+                        Text {
+                            id: entryTime
+
+                            anchors.right: removeButton.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: entry.model.time
+                            font.pixelSize: Tokens.labelMedium
+                            color: Theme.onSurfaceVariant
+                        }
+
+                        IconButton {
+                            id: removeButton
+
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            implicitWidth: 32
+                            implicitHeight: 32
+                            iconSize: 20
+                            icon: "close"
+                            label: qsTr("Remove")
+                            onClicked: popup.notifications.remove(entry.model.id)
+                        }
+                    }
+                }
+            }
         }
 
         Rectangle {
@@ -302,7 +418,7 @@ Window {
             x: content.x
             y: content.y + 48
             width: content.width
-            height: content.height - 48
+            height: 280
             visible: popup.selector !== ""
             radius: Tokens.cornerMedium
             color: Theme.surfaceHigh

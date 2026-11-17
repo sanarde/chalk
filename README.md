@@ -37,6 +37,10 @@ On Wayland the bar is a surface of the layer shell protocol (`wlr-layer-shell`),
 
 In a nested compositor without `linux-dmabuf`, such as `slate --backend winit`, Qt Quick cannot use OpenGL, run with `QT_QUICK_BACKEND=software`.
 
+## Notifications
+
+Chalk is a notification daemon (`org.freedesktop.Notifications`, specification 1.2). New notifications appear as a banner under the bar and stay in the list of the calendar. Critical ones do not expire, up to three actions per notification are shown, and the body may use the markup `<b>`, `<i>`, `<u>` and `<a>`. If another daemon already owns the name (GNOME Shell, dunst and so on) Chalk prints a warning and leaves it alone. Try it with `notify-send -a Name "Title" "Body"`.
+
 ## Activities
 
 The Activities button runs the action `overview` of Slate. On Wayland Slate shows its overview of the windows, on X11 there is no overview and the button does nothing.

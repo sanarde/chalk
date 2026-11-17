@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Network)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Gui Quick Network DBus)
 find_package(Qt6 6.8 QUIET COMPONENTS Test)
 find_package(SanarStyle REQUIRED)
 find_package(PkgConfig REQUIRED)

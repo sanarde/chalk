@@ -89,6 +89,19 @@ void PanelShell::setKind(Kind kind)
     emit kindChanged();
 }
 
+int PanelShell::margin() const
+{
+    return m_margin;
+}
+
+void PanelShell::setMargin(int margin)
+{
+    if (m_margin == margin)
+        return;
+    m_margin = margin;
+    emit marginChanged();
+}
+
 void PanelShell::show()
 {
     if (!m_window)
@@ -101,6 +114,23 @@ void PanelShell::show()
                        | Qt::WindowStaysOnTopHint);
 
     const bool wayland = QGuiApplication::platformName() == QLatin1String("wayland");
+    if (m_kind == Banner) {
+        const QSize size = m_window->size();
+        if (wayland) {
+            m_window->setFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint
+                               | Qt::WindowDoesNotAcceptFocus);
+            m_window->setGeometry(0, 0, size.width(), size.height());
+            placeOnWayland();
+        } else {
+            m_window->setFlags(Qt::ToolTip | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint
+                               | Qt::WindowDoesNotAcceptFocus);
+            m_window->setGeometry(area.center().x() - size.width() / 2, area.top() + m_margin, size.width(),
+                                  size.height());
+        }
+        m_window->show();
+        return;
+    }
+
     if (m_kind == Overlay) {
         m_window->setFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
         m_window->setGeometry(wayland ? QRect(0, 0, 1, 1) : area);
@@ -157,7 +187,15 @@ void PanelShell::roundCorners(int radius)
 void PanelShell::placeOnWayland()
 {
     PanelProperties::Panel panel;
-    if (m_kind == Overlay) {
+    if (m_kind == Banner) {
+        panel.layer = PanelProperties::Overlay;
+        panel.anchors = PanelProperties::AnchorTop;
+        panel.width = m_window->width();
+        panel.height = m_window->height();
+        panel.marginTop = m_margin;
+        panel.exclusive = 0;
+        panel.keyboard = PanelProperties::KeyboardNone;
+    } else if (m_kind == Overlay) {
         panel.layer = PanelProperties::Overlay;
         panel.anchors = PanelProperties::AnchorAll;
         panel.exclusive = -1;

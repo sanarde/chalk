@@ -10,8 +10,13 @@ qt_add_qml_module(chalk
     QML_FILES
         qml/Bar.qml
         qml/CalendarPopup.qml
+        qml/NotificationBanner.qml
         qml/WorkspaceChip.qml
     SOURCES
+        NotificationStore.h
+        NotificationStore.cpp
+        NotificationServer.h
+        NotificationServer.cpp
         Calendar.h
         Calendar.cpp
         SlateState.h
@@ -25,7 +30,7 @@ qt_add_qml_module(chalk
 )
 
 target_link_libraries(chalk PRIVATE
-    Qt6::Core Qt6::Gui Qt6::Quick Qt6::Network
+    Qt6::Core Qt6::Gui Qt6::Quick Qt6::Network Qt6::DBus
     SanarStyle::sanar-style
     PkgConfig::XCB)
 
