@@ -1,5 +1,11 @@
 # Sanar Chalk
 
+> [!NOTE]
+> **Repository Mirrors**
+>
+> - **git.nuros.org** ([sanarde/chalk](https://git.nuros.org/sanarde/chalk)): primary, self-hosted Forgejo instance, accounts restricted to the core team.
+> - **GitHub** ([sanarde/chalk](https://github.com/sanarde/chalk)): mirror for external contributors. Issues and Pull Requests opened here are welcome and are reviewed and processed by the core team.
+
 ## About
 
 Desktop shell of SanarDE.
