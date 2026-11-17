@@ -2,7 +2,6 @@
 
 - Build and run the tests before sending a change: `cmake --build build && ctest --test-dir build`.
 - The windows and the interaction are checked by hand: run Slate on a display such as `Xvfb :99` with `DISPLAY=:99 slate --backend x11`, then `DISPLAY=:99 QT_QPA_PLATFORM=xcb chalk`.
-- Keep each change limited to one area.
 - Report bugs with the version, the steps to reproduce, and the observed output.
 
 Source layout:
@@ -15,7 +14,7 @@ Source layout:
 - `src/Calendar.*`: the month grid (`buildMonth`, tested) and the model of the calendar popup, localized names and the first day of the week of the system.
 - `src/qml`: the components of the bar, `Bar.qml` is the window, `CalendarPopup.qml` the calendar window and `WorkspaceChip.qml` a workspace. Colors and icons come from the `Theme` and `Icon` of Sanar Style, do not write colors in QML.
 
-Code style: C++20, four spaces, no comments except the SPDX line at the top of each file, names that explain themselves.
+Code style: C++20, four spaces, an SPDX line at the top of each file.
 
 Shape, state layer, type and motion tokens, the `StateLayer` and the `PillButton` live in Sanar Style (`Tokens`, `StateLayer`, `PillButton`), not here. Add a new shared token or a generic component there, and keep only the shell specific pieces in `src/qml`.
 
@@ -23,4 +22,5 @@ Shape, state layer, type and motion tokens, the `StateLayer` and the `PillButton
 
 `src/QuickSettings.*` talks to the system (`wpctl`, `nmcli`, logind, sysfs) and keeps the parsers of their output static, so that the tests cover them. `PopupWindow.qml` is the base of the popups (position, animation, shadow, the rounding on X11), build a new popup on it. Never click the controls of the quick settings in a test run, they change the real volume and network of the machine.
 
+- `src/WindowChip.qml` is one entry of the window list in the bar, the list is built from `SlateClient.windows`. `src/AppIconProvider.*` serves `image://appicon/` from the icon theme.
 - `AppCatalog` parses desktop entries and ranks matches in plain C++ (tested in `tests/AppCatalogTest.cpp`); `LauncherPopup` only shows it. Never call `launch` from a test run, it starts a real program.
