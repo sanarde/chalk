@@ -199,7 +199,7 @@ void PanelShell::placeOnWayland()
         panel.layer = PanelProperties::Overlay;
         panel.anchors = PanelProperties::AnchorAll;
         panel.exclusive = -1;
-        panel.keyboard = PanelProperties::KeyboardOnDemand;
+        panel.keyboard = PanelProperties::KeyboardExclusive;
     } else {
         panel.layer = PanelProperties::Top;
         panel.anchors = (m_edge == Top ? PanelProperties::AnchorTop : PanelProperties::AnchorBottom)

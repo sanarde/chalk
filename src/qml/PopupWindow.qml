@@ -59,7 +59,11 @@ Window {
 
     flags: Qt.Popup | Qt.FramelessWindowHint
     color: overlay ? "transparent" : Theme.surfaceHigh
-    onVisibleChanged: round()
+    onVisibleChanged: {
+        if (!visible)
+            shown = false
+        round()
+    }
     onContentHeightChanged: {
         if (visible && !overlay)
             height = contentHeight

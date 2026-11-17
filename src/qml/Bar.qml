@@ -118,6 +118,9 @@ Window {
         anchors.left: leftRow.right
         anchors.leftMargin: 12
         anchors.verticalCenter: parent.verticalCenter
+        width: Math.max(0, room)
+        height: 32
+        clip: true
         spacing: 4
 
         Repeater {
