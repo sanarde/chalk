@@ -2,7 +2,7 @@
 
 ## About
 
-Panels and bars of SanarDE written in C++ and QML, for X11 and Wayland.
+Desktop shell of SanarDE.
 
 ## Dependencies
 
