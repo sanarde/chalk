@@ -129,6 +129,7 @@ Window {
                 width: Math.max(40, Math.min(168, (windowList.room - (windowList.count - 1) * 4) / windowList.count))
                 title: modelData.title
                 app: modelData.app
+                appId: modelData.appId
                 focused: modelData.focused
                 minimized: modelData.minimized
                 onClicked: slate.activateWindow(modelData.id)

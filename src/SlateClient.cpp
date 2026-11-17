@@ -97,6 +97,7 @@ QVariantList SlateClient::windows() const
             {"id", window.id},
             {"title", window.title},
             {"app", appDisplayName(window.appId, window.title)},
+            {"appId", window.appId},
             {"focused", window.focused},
             {"minimized", window.minimized},
         });

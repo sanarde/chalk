@@ -8,6 +8,7 @@ Rectangle {
 
     required property string title
     required property string app
+    required property string appId
     required property bool focused
     required property bool minimized
 
@@ -18,7 +19,7 @@ Rectangle {
     radius: Tokens.cornerSmall
     color: focused ? Theme.secondaryContainer : "transparent"
     border.width: focused ? 0 : 1
-    border.color: Theme.outlineVariant
+    border.color: Theme.outline
     opacity: minimized ? 0.6 : 1
     activeFocusOnTab: true
 
@@ -36,21 +37,38 @@ Rectangle {
         focused: chip.activeFocus
     }
 
-    Rectangle {
+    Item {
         id: badge
 
         x: 8
         anchors.verticalCenter: parent.verticalCenter
-        width: 20
-        height: 20
-        radius: 10
-        color: Theme.primaryContainer
+        width: 18
+        height: 18
+
+        Icon {
+            anchors.centerIn: parent
+            visible: chip.focused
+            name: "check"
+            font.pixelSize: 18
+            color: Theme.onSecondaryContainer
+        }
+
+        Image {
+            id: appImage
+
+            anchors.fill: parent
+            visible: !chip.focused && status === Image.Ready
+            sourceSize: Qt.size(36, 36)
+            source: chip.appId.length > 0 ? "image://appicon/" + chip.appId.toLowerCase() : ""
+        }
 
         Text {
             anchors.centerIn: parent
+            visible: !chip.focused && appImage.status !== Image.Ready
             text: chip.app.charAt(0).toUpperCase()
-            font.pixelSize: Tokens.labelMedium
-            color: Theme.onPrimaryContainer
+            font.pixelSize: Tokens.labelLarge
+            font.weight: Font.Medium
+            color: Theme.primary
         }
     }
 
@@ -63,6 +81,7 @@ Rectangle {
         elide: Text.ElideRight
         text: chip.title.length > 0 ? chip.title : chip.app
         font.pixelSize: Tokens.labelLarge
+        font.weight: Font.Medium
         color: chip.focused ? Theme.onSecondaryContainer : Theme.onSurface
     }
 
