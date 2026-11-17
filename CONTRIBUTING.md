@@ -22,3 +22,5 @@ Shape, state layer, type and motion tokens, the `StateLayer` and the `PillButton
 `src/NotificationStore.*` is the model and the rules of the notifications without D-Bus, so that the tests cover it. `src/NotificationServer.*` is only the D-Bus glue, and `src/qml/NotificationBanner.qml` the banner. Test the daemon on a separate bus, `dbus-run-session -- sh -c '...'`, never on the bus of your session.
 
 `src/QuickSettings.*` talks to the system (`wpctl`, `nmcli`, logind, sysfs) and keeps the parsers of their output static, so that the tests cover them. `PopupWindow.qml` is the base of the popups (position, animation, shadow, the rounding on X11), build a new popup on it. Never click the controls of the quick settings in a test run, they change the real volume and network of the machine.
+
+- `AppCatalog` parses desktop entries and ranks matches in plain C++ (tested in `tests/AppCatalogTest.cpp`); `LauncherPopup` only shows it. Never call `launch` from a test run, it starts a real program.

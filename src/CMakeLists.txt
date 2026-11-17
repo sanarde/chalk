@@ -11,12 +11,17 @@ qt_add_qml_module(chalk
         qml/Bar.qml
         qml/PopupWindow.qml
         qml/CalendarPopup.qml
+        qml/LauncherPopup.qml
         qml/QuickTile.qml
         qml/QuickSettingsPopup.qml
         qml/StatusPill.qml
         qml/NotificationBanner.qml
         qml/WorkspaceChip.qml
     SOURCES
+        AppCatalog.h
+        AppCatalog.cpp
+        AppIconProvider.h
+        AppIconProvider.cpp
         NotificationStore.h
         NotificationStore.cpp
         NotificationServer.h

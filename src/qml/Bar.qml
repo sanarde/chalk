@@ -8,6 +8,7 @@ Window {
     id: bar
 
     property bool openCalendar: false
+    property bool openLauncher: false
 
     title: "Chalk"
     color: Theme.surface
@@ -53,6 +54,13 @@ Window {
         notifications: notifications
     }
 
+    LauncherPopup {
+        id: launcherPopup
+
+        anchorItem: launcherButton
+        transientParent: bar
+    }
+
     CalendarPopup {
         id: calendarPopup
 
@@ -68,6 +76,10 @@ Window {
             openCalendar = false
             Qt.callLater(() => calendarPopup.toggle())
         }
+        if (openLauncher && width > 100) {
+            openLauncher = false
+            Qt.callLater(() => launcherPopup.toggle())
+        }
     }
 
     Row {
@@ -82,6 +94,16 @@ Window {
             iconColor: Theme.onSurface
             label: qsTr("Activities")
             onClicked: slate.action("overview")
+        }
+
+        IconButton {
+            id: launcherButton
+
+            anchors.verticalCenter: parent.verticalCenter
+            icon: "search"
+            iconColor: Theme.onSurface
+            label: qsTr("Search applications")
+            onClicked: launcherPopup.toggle()
         }
 
         Text {

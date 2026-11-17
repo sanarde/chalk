@@ -10,6 +10,7 @@
 
 #include <Style.h>
 
+#include "AppIconProvider.h"
 #include "PanelProperties.h"
 
 int main(int argc, char *argv[])
@@ -35,6 +36,8 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
     const QCommandLineOption calendar(QStringLiteral("calendar"), QStringLiteral("Open the calendar at start"));
     parser.addOption(calendar);
+    const QCommandLineOption launcher(QStringLiteral("launcher"), QStringLiteral("Open the launcher at start"));
+    parser.addOption(launcher);
     parser.process(app);
 
     SanarStyle::init();
@@ -42,7 +45,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,
                      [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
-    engine.setInitialProperties({{"openCalendar", parser.isSet(calendar)}});
+    engine.addImageProvider(QStringLiteral("appicon"), new Chalk::AppIconProvider);
+    engine.setInitialProperties({{"openCalendar", parser.isSet(calendar)}, {"openLauncher", parser.isSet(launcher)}});
     engine.loadFromModule("Sanar.Chalk", "Bar");
 
     return app.exec();

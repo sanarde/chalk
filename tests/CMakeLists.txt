@@ -27,3 +27,10 @@ qt_add_executable(quick-settings-test
 target_include_directories(quick-settings-test PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(quick-settings-test PRIVATE Qt6::Core Qt6::DBus Qt6::Qml Qt6::Test)
 add_test(NAME quick-settings COMMAND quick-settings-test)
+
+qt_add_executable(app-catalog-test
+    AppCatalogTest.cpp
+    ${PROJECT_SOURCE_DIR}/src/AppCatalog.cpp)
+target_include_directories(app-catalog-test PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(app-catalog-test PRIVATE Qt6::Core Qt6::Qml Qt6::Test)
+add_test(NAME app-catalog COMMAND app-catalog-test)
