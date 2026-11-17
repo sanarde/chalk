@@ -9,7 +9,11 @@ qt_add_qml_module(chalk
     VERSION 1.0
     QML_FILES
         qml/Bar.qml
+        qml/PopupWindow.qml
         qml/CalendarPopup.qml
+        qml/QuickTile.qml
+        qml/QuickSettingsPopup.qml
+        qml/StatusPill.qml
         qml/NotificationBanner.qml
         qml/WorkspaceChip.qml
     SOURCES
@@ -17,6 +21,8 @@ qt_add_qml_module(chalk
         NotificationStore.cpp
         NotificationServer.h
         NotificationServer.cpp
+        QuickSettings.h
+        QuickSettings.cpp
         Calendar.h
         Calendar.cpp
         SlateState.h

@@ -4,408 +4,171 @@ import QtQuick
 import Sanar.Chalk
 import Sanar.Style
 
-Window {
+PopupWindow {
     id: popup
 
-    property Item anchorItem
-    property real cardX: 0
-    property real cardY: 0
-    property bool shown: false
     property string selector: ""
     property NotificationStore notifications
     readonly property var yearList: Array.from({ length: 201 }, (_, offset) => 1926 + offset)
     property int selectedYear: 0
     property int selectedMonth: 0
     property int selectedDay: 0
-    readonly property bool overlay: Qt.platform.pluginName === "wayland"
 
-    function dismiss() {
-        if (!shown)
-            return
-        shown = false
-        closeTimer.restart()
-    }
-
-    function toggle() {
-        if (visible && shown) {
-            dismiss()
-            return
-        }
+    contentHeight: content.implicitHeight + 32
+    onOpening: {
         calendar.today()
         selector = ""
-        const point = anchorItem.mapToGlobal(anchorItem.width / 2, anchorItem.height)
-        cardX = Math.round(point.x - card.width / 2)
-        cardY = Math.round(point.y + 4)
-
-        closeTimer.stop()
-        shown = true
-        if (overlay) {
-            shell.show()
-            return
-        }
-        width = card.width
-        height = card.height
-        x = cardX
-        y = cardY
-        show()
     }
-
-    Timer {
-        id: closeTimer
-
-        interval: Tokens.exitDuration
-        onTriggered: popup.hide()
-    }
-
-    flags: Qt.Popup | Qt.FramelessWindowHint
-
-    function round() {
-        if (!overlay && visible)
-            shell.roundCorners(Tokens.cornerExtraLarge)
-    }
-
-    onVisibleChanged: round()
-    onWidthChanged: round()
-    onHeightChanged: round()
-    color: overlay ? "transparent" : Theme.surfaceHigh
 
     Calendar {
         id: calendar
     }
 
-    PanelShell {
-        id: shell
+    Column {
+        id: content
 
-        window: popup
-        kind: PanelShell.Overlay
-    }
+        x: 16
+        y: 16
+        width: parent.width - 32
+        spacing: 8
 
-    Shortcut {
-        sequence: "Escape"
-        onActivated: popup.dismiss()
-    }
+        Item {
+            width: parent.width
+            height: 40
 
-    MouseArea {
-        anchors.fill: parent
-        enabled: popup.overlay
-        onClicked: popup.dismiss()
-    }
+            Row {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 4
 
-    Rectangle {
-        id: card
-
-        x: popup.overlay ? popup.cardX : 0
-        y: popup.overlay ? popup.cardY : 0
-        width: 360
-        height: content.implicitHeight + 32
-        radius: Tokens.cornerExtraLarge
-        color: Theme.surfaceHigh
-        border.width: 1
-        border.color: Theme.outlineVariant
-        opacity: popup.shown ? 1 : 0
-        scale: popup.shown ? 1 : 0.92
-        transformOrigin: Item.Top
-
-        Repeater {
-            model: popup.overlay ? 8 : 0
-
-            Rectangle {
-                required property int index
-
-                z: -1
-                anchors.fill: parent
-                anchors.topMargin: -index
-                anchors.leftMargin: -index * 1.5
-                anchors.rightMargin: -index * 1.5
-                anchors.bottomMargin: -index * 2 - 2
-                radius: card.radius + index * 1.5
-                color: Qt.alpha("black", 0.045)
-            }
-        }
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: popup.shown ? Tokens.enterDuration : Tokens.exitDuration
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: popup.shown ? Tokens.emphasizedDecelerate : Tokens.emphasizedAccelerate
-            }
-        }
-
-        Behavior on scale {
-            NumberAnimation {
-                duration: popup.shown ? Tokens.enterDuration : Tokens.exitDuration
-                easing.type: Easing.BezierSpline
-                easing.bezierCurve: popup.shown ? Tokens.emphasizedDecelerate : Tokens.emphasizedAccelerate
-            }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-        }
-
-        Column {
-            id: content
-
-            x: 16
-            y: 16
-            width: parent.width - 32
-            spacing: 8
-
-            Item {
-                width: parent.width
-                height: 40
-
-                Row {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 4
-
-                    IconButton {
-                        implicitWidth: 32
-                        implicitHeight: 32
-                        iconSize: 20
-                        icon: "chevron_right"
-                        rotation: 180
-                        label: qsTr("Previous month")
-                        onClicked: calendar.previous()
-                    }
-
-                    DropdownButton {
-                        text: calendar.monthName
-                        expanded: popup.selector === "month"
-                        onClicked: popup.selector = popup.selector === "month" ? "" : "month"
-                    }
-
-                    IconButton {
-                        implicitWidth: 32
-                        implicitHeight: 32
-                        iconSize: 20
-                        icon: "chevron_right"
-                        label: qsTr("Next month")
-                        onClicked: calendar.next()
-                    }
+                IconButton {
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    iconSize: 20
+                    icon: "chevron_left"
+                    label: qsTr("Previous month")
+                    onClicked: calendar.previous()
                 }
 
-                Row {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 4
+                DropdownButton {
+                    text: calendar.monthName
+                    expanded: popup.selector === "month"
+                    onClicked: popup.selector = popup.selector === "month" ? "" : "month"
+                }
 
-                    IconButton {
-                        implicitWidth: 32
-                        implicitHeight: 32
-                        iconSize: 20
-                        icon: "chevron_right"
-                        rotation: 180
-                        label: qsTr("Previous year")
-                        onClicked: calendar.show(calendar.year - 1, calendar.month)
-                    }
-
-                    DropdownButton {
-                        text: calendar.year
-                        expanded: popup.selector === "year"
-                        onClicked: popup.selector = popup.selector === "year" ? "" : "year"
-                    }
-
-                    IconButton {
-                        implicitWidth: 32
-                        implicitHeight: 32
-                        iconSize: 20
-                        icon: "chevron_right"
-                        label: qsTr("Next year")
-                        onClicked: calendar.show(calendar.year + 1, calendar.month)
-                    }
+                IconButton {
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    iconSize: 20
+                    icon: "chevron_right"
+                    label: qsTr("Next month")
+                    onClicked: calendar.next()
                 }
             }
 
-            Grid {
-                width: parent.width
-                columns: 7
+            Row {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 4
 
-                Repeater {
-                    model: calendar.weekdays
-
-                    Text {
-                        required property string modelData
-
-                        width: parent.width / 7
-                        height: 40
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        text: modelData
-                        font.pixelSize: Tokens.bodyLarge
-                        color: Theme.onSurface
-                    }
+                IconButton {
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    iconSize: 20
+                    icon: "chevron_left"
+                    label: qsTr("Previous year")
+                    onClicked: calendar.show(calendar.year - 1, calendar.month)
                 }
 
-                Repeater {
-                    model: calendar.days
+                DropdownButton {
+                    text: calendar.year
+                    expanded: popup.selector === "year"
+                    onClicked: popup.selector = popup.selector === "year" ? "" : "year"
+                }
 
-                    Item {
-                        id: cell
-
-                        required property var modelData
-                        readonly property bool selected: modelData.inMonth && popup.selectedYear === calendar.year
-                            && popup.selectedMonth === calendar.month && popup.selectedDay === modelData.day
-
-                        width: parent.width / 7
-                        height: 40
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 40
-                            height: 40
-                            radius: 20
-                            color: cell.selected ? Theme.primary : "transparent"
-                            border.width: cell.modelData.today && !cell.selected ? 1 : 0
-                            border.color: Theme.primary
-
-                            StateLayer {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: cell.selected ? Theme.onPrimary : Theme.onSurface
-                                hovered: cellHover.hovered
-                                pressed: cellTap.pressed
-                            }
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: cell.modelData.day
-                                font.pixelSize: Tokens.bodyLarge
-                                color: cell.selected ? Theme.onPrimary
-                                    : (cell.modelData.today ? Theme.primary
-                                    : (cell.modelData.inMonth ? Theme.onSurface : Qt.alpha(Theme.onSurfaceVariant, 0.5)))
-                            }
-
-                            HoverHandler {
-                                id: cellHover
-                            }
-
-                            TapHandler {
-                                id: cellTap
-
-                                enabled: cell.modelData.inMonth
-                                onTapped: {
-                                    popup.selectedYear = calendar.year
-                                    popup.selectedMonth = calendar.month
-                                    popup.selectedDay = cell.modelData.day
-                                }
-                            }
-                        }
-                    }
+                IconButton {
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    iconSize: 20
+                    icon: "chevron_right"
+                    label: qsTr("Next year")
+                    onClicked: calendar.show(calendar.year + 1, calendar.month)
                 }
             }
+        }
 
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Theme.outlineVariant
-            }
+        Grid {
+            width: parent.width
+            columns: 7
 
-            Item {
-                width: parent.width
-                height: 40
+            Repeater {
+                model: calendar.weekdays
 
                 Text {
-                    anchors.left: parent.left
-                    anchors.leftMargin: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Notifications")
-                    font.pixelSize: Tokens.titleMedium
+                    required property string modelData
+
+                    width: parent.width / 7
+                    height: 40
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    text: modelData
+                    font.pixelSize: Tokens.bodyLarge
                     color: Theme.onSurface
                 }
-
-                PillButton {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: popup.notifications && popup.notifications.count > 0
-                    text: qsTr("Clear all")
-                    textColor: Theme.primary
-                    onClicked: popup.notifications.clear()
-                }
             }
 
-            Item {
-                width: parent.width
-                height: 192
+            Repeater {
+                model: calendar.days
 
-                Text {
-                    anchors.centerIn: parent
-                    visible: !popup.notifications || popup.notifications.count === 0
-                    text: qsTr("No notifications")
-                    font.pixelSize: Tokens.bodyLarge
-                    color: Theme.onSurfaceVariant
-                }
+                Item {
+                    id: cell
 
-                ListView {
-                    anchors.fill: parent
-                    clip: true
-                    model: popup.notifications
+                    required property var modelData
+                    readonly property bool selected: modelData.inMonth && popup.selectedYear === calendar.year
+                        && popup.selectedMonth === calendar.month && popup.selectedDay === modelData.day
 
-                    delegate: Item {
-                        id: entry
+                    width: parent.width / 7
+                    height: 40
 
-                        required property var model
-
-                        width: ListView.view.width
-                        height: 64
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 40
+                        height: 40
+                        radius: 20
+                        color: cell.selected ? Theme.primary : "transparent"
+                        border.width: cell.modelData.today && !cell.selected ? 1 : 0
+                        border.color: Theme.primary
 
                         StateLayer {
                             anchors.fill: parent
-                            radius: Tokens.cornerMedium
-                            hovered: entryHover.hovered
-                        }
-
-                        HoverHandler {
-                            id: entryHover
-                        }
-
-                        Column {
-                            anchors.left: parent.left
-                            anchors.leftMargin: 12
-                            anchors.right: entryTime.left
-                            anchors.rightMargin: 8
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Text {
-                                width: parent.width
-                                elide: Text.ElideRight
-                                text: entry.model.summary
-                                font.pixelSize: Tokens.bodyLarge
-                                color: Theme.onSurface
-                            }
-
-                            Text {
-                                width: parent.width
-                                elide: Text.ElideRight
-                                textFormat: Text.StyledText
-                                text: entry.model.app + (entry.model.body ? "  " + entry.model.body : "")
-                                font.pixelSize: Tokens.labelLarge
-                                color: Theme.onSurfaceVariant
-                            }
+                            radius: parent.radius
+                            color: cell.selected ? Theme.onPrimary : Theme.onSurface
+                            hovered: cellHover.hovered
+                            pressed: cellTap.pressed
                         }
 
                         Text {
-                            id: entryTime
-
-                            anchors.right: removeButton.left
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: entry.model.time
-                            font.pixelSize: Tokens.labelMedium
-                            color: Theme.onSurfaceVariant
+                            anchors.centerIn: parent
+                            text: cell.modelData.day
+                            font.pixelSize: Tokens.bodyLarge
+                            color: cell.selected ? Theme.onPrimary
+                                : (cell.modelData.today ? Theme.primary
+                                : (cell.modelData.inMonth ? Theme.onSurface : Qt.alpha(Theme.onSurfaceVariant, 0.5)))
                         }
 
-                        IconButton {
-                            id: removeButton
+                        HoverHandler {
+                            id: cellHover
+                        }
 
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            implicitWidth: 32
-                            implicitHeight: 32
-                            iconSize: 20
-                            icon: "close"
-                            label: qsTr("Remove")
-                            onClicked: popup.notifications.remove(entry.model.id)
+                        TapHandler {
+                            id: cellTap
+
+                            enabled: cell.modelData.inMonth
+                            onTapped: {
+                                popup.selectedYear = calendar.year
+                                popup.selectedMonth = calendar.month
+                                popup.selectedDay = cell.modelData.day
+                            }
                         }
                     }
                 }
@@ -413,79 +176,194 @@ Window {
         }
 
         Rectangle {
-            id: chooser
+            width: parent.width
+            height: 1
+            color: Theme.outlineVariant
+        }
 
-            x: content.x
-            y: content.y + 48
-            width: content.width
-            height: 280
-            visible: popup.selector !== ""
-            radius: Tokens.cornerMedium
-            color: Theme.surfaceHigh
-            clip: true
+        Item {
+            width: parent.width
+            height: 40
+
+            Text {
+                anchors.left: parent.left
+                anchors.leftMargin: 4
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr("Notifications")
+                font.pixelSize: Tokens.titleMedium
+                color: Theme.onSurface
+            }
+
+            PillButton {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                visible: popup.notifications && popup.notifications.count > 0
+                text: qsTr("Clear all")
+                textColor: Theme.primary
+                onClicked: popup.notifications.clear()
+            }
+        }
+
+        Item {
+            width: parent.width
+            height: 192
+
+            Text {
+                anchors.centerIn: parent
+                visible: !popup.notifications || popup.notifications.count === 0
+                text: qsTr("No notifications")
+                font.pixelSize: Tokens.bodyLarge
+                color: Theme.onSurfaceVariant
+            }
 
             ListView {
-                id: choices
-
                 anchors.fill: parent
-                model: popup.selector === "month" ? calendar.months : yearList
-                currentIndex: popup.selector === "month" ? calendar.month - 1 : calendar.year - yearList[0]
-                onVisibleChanged: if (visible) positionViewAtIndex(Math.max(0, currentIndex - 2), ListView.Beginning)
+                clip: true
+                model: popup.notifications
 
                 delegate: Item {
-                    id: choice
+                    id: entry
 
-                    required property int index
-                    required property var modelData
-                    readonly property bool current: index === choices.currentIndex
+                    required property var model
 
-                    width: choices.width
-                    height: 48
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: choice.current ? Theme.secondaryContainer : "transparent"
-                    }
+                    width: ListView.view.width
+                    height: 64
 
                     StateLayer {
                         anchors.fill: parent
-                        hovered: choiceHover.hovered
-                        pressed: choiceTap.pressed
-                    }
-
-                    Icon {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        name: "check"
-                        visible: choice.current
-                        color: Theme.onSecondaryContainer
-                        font.pixelSize: 20
-                    }
-
-                    Text {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 48
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: choice.modelData
-                        font.pixelSize: Tokens.bodyLarge
-                        color: choice.current ? Theme.onSecondaryContainer : Theme.onSurface
+                        radius: Tokens.cornerMedium
+                        hovered: entryHover.hovered
                     }
 
                     HoverHandler {
-                        id: choiceHover
+                        id: entryHover
                     }
 
-                    TapHandler {
-                        id: choiceTap
+                    Column {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 12
+                        anchors.right: entryTime.left
+                        anchors.rightMargin: 8
+                        anchors.verticalCenter: parent.verticalCenter
 
-                        onTapped: {
-                            if (popup.selector === "month")
-                                calendar.show(calendar.year, choice.index + 1)
-                            else
-                                calendar.show(choice.modelData, calendar.month)
-                            popup.selector = ""
+                        Text {
+                            width: parent.width
+                            elide: Text.ElideRight
+                            text: entry.model.summary
+                            font.pixelSize: Tokens.bodyLarge
+                            color: Theme.onSurface
                         }
+
+                        Text {
+                            width: parent.width
+                            elide: Text.ElideRight
+                            textFormat: Text.StyledText
+                            text: entry.model.app + (entry.model.body ? "  " + entry.model.body : "")
+                            font.pixelSize: Tokens.labelLarge
+                            color: Theme.onSurfaceVariant
+                        }
+                    }
+
+                    Text {
+                        id: entryTime
+
+                        anchors.right: removeButton.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: entry.model.time
+                        font.pixelSize: Tokens.labelMedium
+                        color: Theme.onSurfaceVariant
+                    }
+
+                    IconButton {
+                        id: removeButton
+
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        implicitWidth: 32
+                        implicitHeight: 32
+                        iconSize: 20
+                        icon: "close"
+                        label: qsTr("Remove")
+                        onClicked: popup.notifications.remove(entry.model.id)
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        id: chooser
+
+        x: content.x
+        y: content.y + 48
+        width: content.width
+        height: 280
+        visible: popup.selector !== ""
+        radius: Tokens.cornerMedium
+        color: Theme.surfaceHigh
+        clip: true
+
+        ListView {
+            id: choices
+
+            anchors.fill: parent
+            model: popup.selector === "month" ? calendar.months : yearList
+            currentIndex: popup.selector === "month" ? calendar.month - 1 : calendar.year - yearList[0]
+            onVisibleChanged: if (visible) positionViewAtIndex(Math.max(0, currentIndex - 2), ListView.Beginning)
+
+            delegate: Item {
+                id: choice
+
+                required property int index
+                required property var modelData
+                readonly property bool current: index === choices.currentIndex
+
+                width: choices.width
+                height: 48
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: choice.current ? Theme.secondaryContainer : "transparent"
+                }
+
+                StateLayer {
+                    anchors.fill: parent
+                    hovered: choiceHover.hovered
+                    pressed: choiceTap.pressed
+                }
+
+                Icon {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    name: "check"
+                    visible: choice.current
+                    color: Theme.onSecondaryContainer
+                    font.pixelSize: 20
+                }
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 48
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: choice.modelData
+                    font.pixelSize: Tokens.bodyLarge
+                    color: choice.current ? Theme.onSecondaryContainer : Theme.onSurface
+                }
+
+                HoverHandler {
+                    id: choiceHover
+                }
+
+                TapHandler {
+                    id: choiceTap
+
+                    onTapped: {
+                        if (popup.selector === "month")
+                            calendar.show(calendar.year, choice.index + 1)
+                        else
+                            calendar.show(choice.modelData, calendar.month)
+                        popup.selector = ""
                     }
                 }
             }

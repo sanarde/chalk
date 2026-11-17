@@ -17,6 +17,7 @@ class NotificationStore : public QAbstractListModel
     QML_ELEMENT
     Q_PROPERTY(int count READ count NOTIFY countChanged FINAL)
     Q_PROPERTY(QVariantMap banner READ banner NOTIFY bannerChanged FINAL)
+    Q_PROPERTY(bool doNotDisturb READ doNotDisturb WRITE setDoNotDisturb NOTIFY doNotDisturbChanged FINAL)
 
 public:
     enum Role {
@@ -45,6 +46,8 @@ public:
 
     int count() const;
     QVariantMap banner() const;
+    bool doNotDisturb() const;
+    void setDoNotDisturb(bool enabled);
 
     uint notify(const QString &app, uint replacesId, const QString &summary, const QString &body,
                 const QStringList &actions, const QVariantMap &hints, int expireTimeout);
@@ -61,6 +64,7 @@ public:
 signals:
     void countChanged();
     void bannerChanged();
+    void doNotDisturbChanged();
     void closed(uint id, uint reason);
     void actionInvoked(uint id, const QString &key);
 
@@ -84,6 +88,7 @@ private:
     QList<Entry> m_entries;
     uint m_nextId = 1;
     uint m_bannerId = 0;
+    bool m_doNotDisturb = false;
     QTimer m_bannerTimer;
 };
 

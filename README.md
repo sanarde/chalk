@@ -41,6 +41,10 @@ In a nested compositor without `linux-dmabuf`, such as `slate --backend winit`, 
 
 Chalk is a notification daemon (`org.freedesktop.Notifications`, specification 1.2). New notifications appear as a banner under the bar and stay in the list of the calendar. Critical ones do not expire, up to three actions per notification are shown, and the body may use the markup `<b>`, `<i>`, `<u>` and `<a>`. If another daemon already owns the name (GNOME Shell, dunst and so on) Chalk prints a warning and leaves it alone. Try it with `notify-send -a Name "Title" "Body"`.
 
+## Quick settings
+
+The pill with the status icons at the right end of the bar opens the quick settings: tiles for Wi-Fi, Do not disturb, the dark theme and the sound, the volume and brightness sliders and the battery. The volume goes through `wpctl` (PipeWire), Wi-Fi through `nmcli`, the brightness through the `SetBrightness` of logind (no root needed) and the battery is read from `/sys/class/power_supply`. A control that is not available on the machine is hidden.
+
 ## Activities
 
 The Activities button runs the action `overview` of Slate. On Wayland Slate shows its overview of the windows, on X11 there is no overview and the button does nothing.

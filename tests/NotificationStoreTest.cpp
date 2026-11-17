@@ -26,6 +26,7 @@ private slots:
     void removingReportsTheCloseReasonOnlyForLiveEntries();
     void invokingChecksTheKeyAndHidesTheBanner();
     void clearingReportsEveryLiveEntry();
+    void doNotDisturbKeepsQuietNotificationsInTheHistoryOnly();
 };
 
 static uint post(NotificationStore &store, const QString &summary, uint replaces = 0, int timeout = 0,
@@ -194,6 +195,25 @@ void NotificationStoreTest::clearingReportsEveryLiveEntry()
     QCOMPARE(store.count(), 0);
     QCOMPARE(closed.size(), 2);
     QVERIFY(store.banner().isEmpty());
+}
+
+void NotificationStoreTest::doNotDisturbKeepsQuietNotificationsInTheHistoryOnly()
+{
+    NotificationStore store;
+    QSignalSpy closed(&store, &NotificationStore::closed);
+    store.setDoNotDisturb(true);
+    post(store, "quiet");
+    QVERIFY(store.banner().isEmpty());
+    QCOMPARE(store.count(), 1);
+    QVERIFY(!store.data(store.index(0), NotificationStore::LiveRole).toBool());
+    QCOMPARE(closed.size(), 1);
+
+    post(store, "urgent", 0, 0, {{"urgency", 2}});
+    QVERIFY(!store.banner().isEmpty());
+
+    store.setDoNotDisturb(false);
+    post(store, "loud");
+    QCOMPARE(store.banner().value("summary").toString(), QStringLiteral("loud"));
 }
 
 QTEST_GUILESS_MAIN(NotificationStoreTest)

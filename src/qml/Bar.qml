@@ -40,6 +40,19 @@ Window {
         store: notifications
     }
 
+    QuickSettings {
+        id: quick
+    }
+
+    QuickSettingsPopup {
+        id: quickPopup
+
+        anchorItem: statusPill
+        transientParent: bar
+        settings: quick
+        notifications: notifications
+    }
+
     CalendarPopup {
         id: calendarPopup
 
@@ -118,6 +131,16 @@ Window {
                 active: modelData.active
                 onClicked: slate.switchWorkspace(modelData.index)
             }
+        }
+
+        StatusPill {
+            id: statusPill
+
+            anchors.verticalCenter: parent.verticalCenter
+            settings: quick
+            quiet: notifications.doNotDisturb
+            highlighted: quickPopup.visible
+            onClicked: quickPopup.toggle()
         }
     }
 }

@@ -20,3 +20,10 @@ qt_add_executable(notification-store-test
 target_include_directories(notification-store-test PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(notification-store-test PRIVATE Qt6::Core Qt6::Qml Qt6::Test)
 add_test(NAME notification-store COMMAND notification-store-test)
+
+qt_add_executable(quick-settings-test
+    QuickSettingsTest.cpp
+    ${PROJECT_SOURCE_DIR}/src/QuickSettings.cpp)
+target_include_directories(quick-settings-test PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(quick-settings-test PRIVATE Qt6::Core Qt6::DBus Qt6::Qml Qt6::Test)
+add_test(NAME quick-settings COMMAND quick-settings-test)

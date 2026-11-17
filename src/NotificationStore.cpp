@@ -82,6 +82,21 @@ QVariantMap NotificationStore::banner() const
     };
 }
 
+bool NotificationStore::doNotDisturb() const
+{
+    return m_doNotDisturb;
+}
+
+void NotificationStore::setDoNotDisturb(bool enabled)
+{
+    if (m_doNotDisturb == enabled)
+        return;
+    m_doNotDisturb = enabled;
+    if (enabled)
+        hideBanner();
+    emit doNotDisturbChanged();
+}
+
 int NotificationStore::indexOf(uint id) const
 {
     for (int row = 0; row < m_entries.size(); ++row) {
@@ -152,6 +167,16 @@ uint NotificationStore::notify(const QString &app, uint replacesId, const QStrin
                 emit closed(dropped, Undefined);
         }
         emit countChanged();
+    }
+
+    if (m_doNotDisturb && entry.urgency < CriticalUrgency) {
+        const int row = indexOf(entry.id);
+        if (row >= 0) {
+            m_entries[row].live = false;
+            emit dataChanged(index(row), index(row), {LiveRole});
+        }
+        emit closed(entry.id, Undefined);
+        return entry.id;
     }
 
     showBanner(entry, bannerTimeout(expireTimeout, entry.urgency));
