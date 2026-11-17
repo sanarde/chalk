@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QString>
+#include <QtGlobal>
 
 namespace Chalk {
 
@@ -16,10 +17,22 @@ struct WorkspaceInfo {
     bool operator==(const WorkspaceInfo &other) const = default;
 };
 
+struct WindowInfo {
+    quint64 id = 0;
+    QString title;
+    QString appId;
+    int workspace = 0;
+    bool focused = false;
+    bool minimized = false;
+
+    bool operator==(const WindowInfo &other) const = default;
+};
+
 struct SlateState {
     bool valid = false;
     int workspace = 0;
     QList<WorkspaceInfo> workspaces;
+    QList<WindowInfo> windows;
     QString focusedTitle;
     QString focusedAppId;
 };

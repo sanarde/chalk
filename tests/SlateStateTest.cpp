@@ -16,6 +16,7 @@ private slots:
     void rejectsErrorsAndGarbage();
     void leavesTheTitleEmptyWhenNothingIsFocused();
     void buildsTheAppNameFromTheAppId();
+    void listsTheWindowsWithTheirState();
 };
 
 void SlateStateTest::parsesTheWorkspacesAndTheFocusedTitle()
@@ -33,6 +34,25 @@ void SlateStateTest::parsesTheWorkspacesAndTheFocusedTitle()
     QCOMPARE(state.workspaces[1], (WorkspaceInfo{.index = 2, .windows = 3, .active = true}));
     QCOMPARE(state.focusedTitle, QStringLiteral("Terminal"));
     QCOMPARE(state.focusedAppId, QStringLiteral("org.gnome.Terminal"));
+}
+
+void SlateStateTest::listsTheWindowsWithTheirState()
+{
+    const QByteArray line = R"({"ok":true,"data":{"workspace":1,"focused":2,
+        "workspaces":[{"index":1,"layout":"floating","windows":2,"active":true}],
+        "windows":[{"id":1,"title":"Notes","app_id":"notes","workspace":1,"focused":false,"minimized":true},
+                   {"id":2,"title":"Shell","app_id":"term","workspace":1,"focused":true,"minimized":false},
+                   {"title":"broken"}],
+        "outputs":[]}})";
+
+    const SlateState state = parseState(line);
+    QCOMPARE(state.windows.size(), 2);
+    QCOMPARE(state.windows[0].id, quint64(1));
+    QVERIFY(state.windows[0].minimized);
+    QVERIFY(!state.windows[0].focused);
+    QCOMPARE(state.windows[1].appId, QStringLiteral("term"));
+    QVERIFY(state.windows[1].focused);
+    QCOMPARE(state.windows[1].workspace, 1);
 }
 
 void SlateStateTest::ignoresAnAcknowledgementWithoutState()

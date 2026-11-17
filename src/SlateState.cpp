@@ -33,10 +33,20 @@ SlateState parseState(const QByteArray &line)
 
     for (const QJsonValue &value : data.value("windows").toArray()) {
         const QJsonObject window = value.toObject();
-        if (window.value("focused").toBool()) {
+        const double id = window.value("id").toDouble(-1);
+        if (id >= 0) {
+            state.windows.append({
+                .id = static_cast<quint64>(id),
+                .title = window.value("title").toString(),
+                .appId = window.value("app_id").toString(),
+                .workspace = window.value("workspace").toInt(),
+                .focused = window.value("focused").toBool(),
+                .minimized = window.value("minimized").toBool(),
+            });
+        }
+        if (state.focusedTitle.isEmpty() && window.value("focused").toBool()) {
             state.focusedTitle = window.value("title").toString();
             state.focusedAppId = window.value("app_id").toString();
-            break;
         }
     }
     return state;

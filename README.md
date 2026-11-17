@@ -41,6 +41,10 @@ In a nested compositor without `linux-dmabuf`, such as `slate --backend winit`, 
 
 Chalk is a notification daemon (`org.freedesktop.Notifications`, specification 1.2). New notifications appear as a banner under the bar and stay in the list of the calendar. Critical ones do not expire, up to three actions per notification are shown, and the body may use the markup `<b>`, `<i>`, `<u>` and `<a>`. If another daemon already owns the name (GNOME Shell, dunst and so on) Chalk prints a warning and leaves it alone. Try it with `notify-send -a Name "Title" "Body"`.
 
+## Window list
+
+The bar shows one chip per window of the current workspace, in a stable order. The focused one is filled with the secondary container, minimized ones are dimmed. A click focuses a window, restores a minimized one, and minimizes the focused one. The chips share the room up to the clock and shrink when there are many.
+
 ## Launcher
 
 The search button in the bar opens a list of installed applications (`.desktop` files from the XDG data directories, the user ones first). Type to filter: names that start with the text come first, then word starts, then substrings, then keywords, ids and comments. Up and Down move, Return starts the application, Escape closes. Entries that are hidden, terminal only or limited by `OnlyShowIn` and `NotShowIn` for the current desktop are skipped, and the localized name and comment are used. Icons come from the icon theme; a letter is shown when there is none. `chalk --launcher` opens it at start.

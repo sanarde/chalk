@@ -16,6 +16,7 @@ qt_add_qml_module(chalk
         qml/QuickSettingsPopup.qml
         qml/StatusPill.qml
         qml/NotificationBanner.qml
+        qml/WindowChip.qml
         qml/WorkspaceChip.qml
     SOURCES
         AppCatalog.h

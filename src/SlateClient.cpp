@@ -2,6 +2,8 @@
 
 #include "SlateClient.h"
 
+#include <algorithm>
+
 #include <QDir>
 #include <QVariantMap>
 
@@ -81,6 +83,43 @@ QString SlateClient::focusedTitle() const
 QString SlateClient::focusedApp() const
 {
     return appDisplayName(m_state.focusedAppId, m_state.focusedTitle);
+}
+
+QVariantList SlateClient::windows() const
+{
+    QList<WindowInfo> ordered = m_state.windows;
+    std::sort(ordered.begin(), ordered.end(), [](const WindowInfo &a, const WindowInfo &b) { return a.id < b.id; });
+    QVariantList out;
+    for (const WindowInfo &window : ordered) {
+        if (window.workspace != m_state.workspace)
+            continue;
+        out.append(QVariantMap{
+            {"id", window.id},
+            {"title", window.title},
+            {"app", appDisplayName(window.appId, window.title)},
+            {"focused", window.focused},
+            {"minimized", window.minimized},
+        });
+    }
+    return out;
+}
+
+void SlateClient::activateWindow(qulonglong id)
+{
+    if (m_control.state() != QLocalSocket::ConnectedState)
+        return;
+    for (const WindowInfo &window : m_state.windows) {
+        if (window.id != id)
+            continue;
+        if (window.focused && !window.minimized) {
+            m_control.write(command("minimize " + QByteArray::number(id)));
+        } else {
+            if (window.minimized)
+                m_control.write(command("restore " + QByteArray::number(id)));
+            m_control.write(command("focus " + QByteArray::number(id)));
+        }
+        return;
+    }
 }
 
 void SlateClient::switchWorkspace(int index)

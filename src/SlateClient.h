@@ -20,6 +20,7 @@ class SlateClient : public QObject
     Q_PROPERTY(bool connected READ connected NOTIFY changed FINAL)
     Q_PROPERTY(int workspace READ workspace NOTIFY changed FINAL)
     Q_PROPERTY(QVariantList workspaces READ workspaces NOTIFY changed FINAL)
+    Q_PROPERTY(QVariantList windows READ windows NOTIFY changed FINAL)
     Q_PROPERTY(QString focusedTitle READ focusedTitle NOTIFY changed FINAL)
     Q_PROPERTY(QString focusedApp READ focusedApp NOTIFY changed FINAL)
 
@@ -29,10 +30,12 @@ public:
     bool connected() const;
     int workspace() const;
     QVariantList workspaces() const;
+    QVariantList windows() const;
     QString focusedTitle() const;
     QString focusedApp() const;
 
     Q_INVOKABLE void switchWorkspace(int index);
+    Q_INVOKABLE void activateWindow(qulonglong id);
     Q_INVOKABLE void action(const QString &action);
 
     static QString socketPath();

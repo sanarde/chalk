@@ -83,6 +83,8 @@ Window {
     }
 
     Row {
+        id: leftRow
+
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
@@ -105,15 +107,32 @@ Window {
             label: qsTr("Search applications")
             onClicked: launcherPopup.toggle()
         }
+    }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            leftPadding: 4
-            width: Math.min(implicitWidth, bar.width / 4)
-            elide: Text.ElideRight
-            text: slate.connected ? slate.focusedApp : ""
-            font.pixelSize: Tokens.titleMedium
-            color: Theme.onSurface
+    Row {
+        id: windowList
+
+        readonly property real room: clockButton.x - x - 16
+        readonly property int count: Math.max(1, slate.windows.length)
+
+        anchors.left: leftRow.right
+        anchors.leftMargin: 12
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 4
+
+        Repeater {
+            model: slate.windows
+
+            WindowChip {
+                required property var modelData
+
+                width: Math.max(40, Math.min(168, (windowList.room - (windowList.count - 1) * 4) / windowList.count))
+                title: modelData.title
+                app: modelData.app
+                focused: modelData.focused
+                minimized: modelData.minimized
+                onClicked: slate.activateWindow(modelData.id)
+            }
         }
     }
 
